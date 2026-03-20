@@ -1,34 +1,42 @@
-export const dailyStats = [
-  {
-    source: 'UKMTO/JMIC',
-    date: '2026-03-17',
-    count: 4,
-    changePercent: -81.0,
-  },
-  {
-    source: 'Windward',
-    date: '2026-03-16',
-    count: 2,
-    changePercent: -71.4,
-  },
-  {
-    source: 'Kpler',
-    date: '2026-03-17',
-    count: 0,
-    changePercent: -100.0,
-  },
-];
+import { calcPressureCoefficient, calcCommodityPressure, calcChangePercent } from './calc';
 
-export const pressureCoefficient = 86.67;
+// 3月1日基准（用于计算"较03-01"的变化幅度）
+const MAR1_BASELINE = {
+  'UKMTO/JMIC': 21,
+  'Windward': 7,
+  'Kpler': 8,
+};
 
-export const commodityPressure = [
-  { name: '甲醇', value: 99.0 },
-  { name: '原油及成品油', value: 95.5 },
-  { name: '液化石油气（LPG）', value: 95.1 },
-  { name: '化肥（尿素及磷肥）', value: 92.2 },
-  { name: '液化天然气（LNG）', value: 92.0 },
-  { name: '铝及铝制品', value: 88.3 },
-];
+// 当前各数据源最新过境数（模拟，后续替换为 API 数据）
+const currentCounts = {
+  'UKMTO/JMIC': { date: '2026-03-17', count: 4 },
+  'Windward':   { date: '2026-03-16', count: 2 },
+  'Kpler':      { date: '2026-03-17', count: 0 },
+};
+
+export const dailyStats = Object.entries(currentCounts).map(([source, { date, count }]) => ({
+  source,
+  date,
+  count,
+  changePercent: calcChangePercent(count, MAR1_BASELINE[source]),
+}));
+
+// 当前各商品每日过境数（模拟，后续替换为 aisstream.io 计数 + 船型映射）
+const currentCommodityCounts = {
+  '甲醇':              0.02,
+  '原油及成品油':       2.6,
+  '液化石油气（LPG）':  0.42,
+  '化肥（尿素及磷肥）': 0.25,
+  '液化天然气（LNG）':  0.96,
+  '铝及铝制品':         0.21,
+};
+
+// 总过境量取三个数据源的均值
+const avgCurrentDaily = (4 + 2 + 0) / 3;
+
+export const pressureCoefficient = calcPressureCoefficient(avgCurrentDaily);
+
+export const commodityPressure = calcCommodityPressure(currentCommodityCounts);
 
 // Mock vessel data near Strait of Hormuz
 export const vessels = [
