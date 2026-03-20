@@ -15,11 +15,12 @@ export const COMMODITY_BASELINES = {
  * 计算行业通行压力系数
  * 压力系数 = 1 - (当前过境量 / 历史基准均值)
  * 含义：过境越少 → 压力越高 → 系数越大
- * @param {number} currentDaily 当前日均过境船只数
+ * @param {number} currentDaily  当前日均过境船只数
+ * @param {number} [baselineDaily] 历史基准（默认用 BASELINE_DAILY 静态值）
  * @returns {number} 压力系数百分比 (0-100)
  */
-export function calcPressureCoefficient(currentDaily) {
-  const ratio = currentDaily / BASELINE_DAILY;
+export function calcPressureCoefficient(currentDaily, baselineDaily = BASELINE_DAILY) {
+  const ratio = currentDaily / baselineDaily;
   return Math.min(100, Math.max(0, (1 - ratio) * 100));
 }
 
